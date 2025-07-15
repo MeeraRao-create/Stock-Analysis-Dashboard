@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Analysis Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="text-center mb-4">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Stock Analysis Dashboard
+                </h1>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="row mb-4">
+            <div class="col-12 col-md-6 mx-auto">
+                <div class="card bg-secondary">
+                    <div class="card-body">
+                        <form id="stockForm">
+                            <div class="input-group">
+                                <input type="text" id="stockSymbol" class="form-control bg-dark text-light border-secondary" 
+                                       placeholder="Enter stock symbol (e.g., AAPL, GOOGL, TSLA)" required>
+                                <button class="btn btn-primary" type="submit" id="searchBtn">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="row d-none">
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Fetching stock data...</p>
+            </div>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="row d-none">
+            <div class="col-12">
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="errorMessage">An error occurred while fetching data.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Overview -->
+        <div id="stockOverview" class="row mb-4 d-none">
+            <div class="col-12">
+                <div class="card bg-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title mb-0">
+                            <span id="stockName">Stock Overview</span>
+                            <span id="stockPrice" class="float-end"></span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="metric-card p-3 rounded bg-dark">
+                                    <div class="metric-label">Change</div>
+                                    <div id="priceChange" class="metric-value"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="metric-card p-3 rounded bg-dark">
+                                    <div class="metric-label">Change %</div>
+                                    <div id="priceChangePercent" class="metric-value"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="metric-card p-3 rounded bg-dark">
+                                    <div class="metric-label">Volume</div>
+                                    <div id="volume" class="metric-value"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="metric-card p-3 rounded bg-dark">
+                                    <div class="metric-label">Market Cap</div>
+                                    <div id="marketCap" class="metric-value"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div id="chartSection" class="row mb-4 d-none">
+            <div class="col-12">
+                <div class="card bg-secondary">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">Price Chart</h4>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary time-range-btn active" data-range="1D">1D</button>
+                            <button type="button" class="btn btn-outline-primary time-range-btn" data-range="5D">5D</button>
+                            <button type="button" class="btn btn-outline-primary time-range-btn" data-range="1M">1M</button>
+                            <button type="button" class="btn btn-outline-primary time-range-btn" data-range="3M">3M</button>
+                            <button type="button" class="btn btn-outline-primary time-range-btn" data-range="1Y">1Y</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="priceChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div id="dataSection" class="row d-none">
+            <div class="col-12">
+                <div class="card bg-secondary">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">Financial Data</h4>
+                        <button id="exportBtn" class="btn btn-success btn-sm">
+                            <i class="fas fa-download me-2"></i>Export CSV
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="dataTable" class="table table-dark table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>Value</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Axios for API calls -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Papa Parse for CSV -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="api.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
